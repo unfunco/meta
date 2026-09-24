@@ -4,8 +4,9 @@ on:
   workflow_call:
     inputs:
       terraform-version-file:
-        description: Path to the file containing the Terraform version.
-        required: true
+        default: ''
+        description: Path to the Terraform version file from the repository root; defaults to .terraform-version in the working directory.
+        required: false
         type: string
       working-directory:
         default: .
@@ -28,7 +29,7 @@ jobs:
     - name: Determine Terraform version
       id: terraform-version
       env:
-        TERRAFORM_VERSION_FILE: ${{ inputs.terraform-version-file }}
+        TERRAFORM_VERSION_FILE: ${{ inputs.terraform-version-file || format('{0}/.terraform-version', inputs.working-directory) }}
       run: |
         if [ ! -f "$TERRAFORM_VERSION_FILE" ]; then
           >&2 echo "Terraform version file not found: $TERRAFORM_VERSION_FILE"
