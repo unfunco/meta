@@ -1,0 +1,54 @@
+name: Verify Go
+
+on:
+  workflow_call:
+    inputs:
+      go-version-file:
+        default: ''
+        description: Path to the Go version file from the repository root; defaults to go.mod in the working directory.
+        required: false
+        type: string
+      working-directory:
+        default: .
+        description: The working directory for Go commands.
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ubuntu-26.04
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+    - name: Set up Go
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+      with:
+        cache-dependency-path: ${{ format('{0}/go.mod', inputs.working-directory) }}
+        go-version-file: ${{ inputs.go-version-file || format('{0}/go.mod', inputs.working-directory) }}
+    - name: Check formatting
+      run: test -z "$(go fmt ./...)"
+      working-directory: ${{ inputs.working-directory }}
+    - name: Check dependencies
+      run: go mod verify
+      working-directory: ${{ inputs.working-directory }}
+    - name: Ensure dependencies are tidy
+      run: |
+        go mod tidy
+        git diff --exit-code -- go.mod go.sum
+        if test -f go.sum && ! git ls-files --error-unmatch -- go.sum >/dev/null 2>&1; then
+          >&2 echo "go mod tidy created an untracked go.sum"
+          exit 1
+        fi
+      working-directory: ${{ inputs.working-directory }}
+    - name: Vet code
+      run: go vet ./...
+      working-directory: ${{ inputs.working-directory }}
+    - name: Run unit tests
+      run: go test ./... -v
+      working-directory: ${{ inputs.working-directory }}
