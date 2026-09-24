@@ -1,0 +1,41 @@
+name: PR / Label
+
+on:
+  pull_request_target: { }
+
+jobs:
+  triage:
+    name: Triage
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-slim
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+    - name: Apply commit message labels
+      uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+      with:
+        script: |
+          const prefixToLabelMap = {
+            'chore 🧹': 'chore:',
+            'feature 🎉': 'feat:',
+            'fix 🐛': 'fix:',
+            'refactor 🔧': 'refactor:'
+          }
+
+          const labels = []
+          for (const [label, prefix] of Object.entries(prefixToLabelMap)) {
+            if (context.payload.pull_request.title.startsWith(prefix)) {
+              labels.push(label)
+            }
+          }
+
+          if (labels.length > 0) {
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              labels,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            })
+          }
