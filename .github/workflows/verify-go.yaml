@@ -5,7 +5,9 @@ on:
     inputs:
       go-version-file:
         default: ''
-        description: Path to the Go version file from the repository root; defaults to go.mod in the working directory.
+        description: |
+          Path to the Go version file from the repository root;
+          defaults to go.mod in the working directory.
         required: false
         type: string
       working-directory:

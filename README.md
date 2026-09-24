@@ -1,6 +1,6 @@
 # meta
 
-Reusable GitHub Actions.
+Reusable GitHub Actions workflows.
 
 ## License
 

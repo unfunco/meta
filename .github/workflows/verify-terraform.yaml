@@ -3,9 +3,16 @@ name: Verify Terraform
 on:
   workflow_call:
     inputs:
+      run-tests:
+        default: false
+        description: Run Terraform tests.
+        required: false
+        type: boolean
       terraform-version-file:
         default: ''
-        description: Path to the Terraform version file from the repository root; defaults to .terraform-version in the working directory.
+        description: |
+          Path to the Terraform version file from the repository root;
+          defaults to .terraform-version in the working directory.
         required: false
         type: string
       working-directory:
@@ -58,4 +65,8 @@ jobs:
       working-directory: ${{ inputs.working-directory }}
     - name: Validate configuration
       run: terraform validate
+      working-directory: ${{ inputs.working-directory }}
+    - name: Run tests
+      if: ${{ inputs.run-tests }}
+      run: terraform test
       working-directory: ${{ inputs.working-directory }}
