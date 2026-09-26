@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.2.0](https://github.com/unfunco/meta/compare/v0.1.0...v0.2.0) (2026-09-26)
+
+
+### 🎉 New features
+
+* Add reusable Go build workflow ([#20](https://github.com/unfunco/meta/issues/20)) ([e1dc62f](https://github.com/unfunco/meta/commit/e1dc62f98e1814906af3692d9758e660c6b2525d))
+* Configure the Go linter version ([#17](https://github.com/unfunco/meta/issues/17)) ([87dd180](https://github.com/unfunco/meta/commit/87dd180d49ce3eb61596a276dda7c7ca6968a81c))
+
+
+### 🐛 Bug fixes
+
+* Restrict pull request labelling permissions ([#19](https://github.com/unfunco/meta/issues/19)) ([96d7c2a](https://github.com/unfunco/meta/commit/96d7c2a4d399d3106d2e845906fe2fff9f69cf19))
+
+
+### 🧹 Miscellaneous
+
+* Correct release workflow naming ([#15](https://github.com/unfunco/meta/issues/15)) ([3ebdbc7](https://github.com/unfunco/meta/commit/3ebdbc710fd2235585d2293447cec54f13d8f307))
+* Distinguish release job name ([#16](https://github.com/unfunco/meta/issues/16)) ([a753d23](https://github.com/unfunco/meta/commit/a753d231d8b338a7ed69a5097c45d2bf017ba0dd))
+* Lint GitHub Actions workflows ([#18](https://github.com/unfunco/meta/issues/18)) ([a730987](https://github.com/unfunco/meta/commit/a73098721ef68fbaf050182a3e85121fa8a58807))
+* Prefix self-managed workflows ([#14](https://github.com/unfunco/meta/issues/14)) ([f139e37](https://github.com/unfunco/meta/commit/f139e379a3e26e153e8ce2c38cafeda9a7805da0))
+* Reuse release workflow ([#12](https://github.com/unfunco/meta/issues/12)) ([983d43b](https://github.com/unfunco/meta/commit/983d43b25a00fdd14bd2d8abfd8af57be16c79ca))
+
 ## 0.1.0 (2026-09-24)
 
 
