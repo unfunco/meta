@@ -1,0 +1,113 @@
+name: Build Go
+
+on:
+  workflow_call:
+    inputs:
+      binary-name:
+        description: The name of the binary to build.
+        required: true
+        type: string
+      build-tags:
+        default: ''
+        description: A comma-separated list of build tags.
+        required: false
+        type: string
+      go-version-file:
+        default: go.mod
+        description: Path to the Go version file from the working directory.
+        required: false
+        type: string
+      ldflags:
+        default: -s -w
+        description: Arguments to pass to the Go linker.
+        required: false
+        type: string
+      package:
+        default: .
+        description: The main package to build from the working directory.
+        required: false
+        type: string
+      retention-days:
+        default: 7
+        description: The number of days to retain build artifacts.
+        required: false
+        type: number
+      targets:
+        default: >-
+          [{"goos":"darwin","goarch":"amd64"},{"goos":"darwin","goarch":"arm64"},
+          {"goos":"linux","goarch":"amd64"},{"goos":"linux","goarch":"arm64"},
+          {"goos":"windows","goarch":"amd64"},{"goos":"windows","goarch":"arm64"}]
+        description: A JSON array of GOOS and GOARCH build targets.
+        required: false
+        type: string
+      working-directory:
+        default: .
+        description: The working directory for Go commands.
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build (${{ matrix.target.goos }}/${{ matrix.target.goarch }})
+    runs-on: ubuntu-26.04
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      with:
+        persist-credentials: false
+    - name: Set up Go
+      uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+      with:
+        cache-dependency-path: ${{ format('{0}/go.mod', inputs.working-directory) }}
+        go-version-file: ${{ format('{0}/{1}', inputs.working-directory, inputs.go-version-file) }}
+    - name: Build binary
+      id: build
+      env:
+        BINARY_NAME: ${{ inputs.binary-name }}
+        BUILD_TAGS: ${{ inputs.build-tags }}
+        GOARCH: ${{ matrix.target.goarch }}
+        GOOS: ${{ matrix.target.goos }}
+        LDFLAGS: ${{ inputs.ldflags }}
+        OUTPUT_DIRECTORY: ${{ runner.temp }}/build-go
+        PACKAGE: ${{ inputs.package }}
+      run: |
+        mkdir -p "$OUTPUT_DIRECTORY"
+        OUTPUT="$OUTPUT_DIRECTORY/$BINARY_NAME"
+        if [[ "$GOOS" == windows ]]; then
+          OUTPUT+=.exe
+        fi
+
+        BUILD_ARGUMENTS=(-trimpath -o "$OUTPUT")
+        if [[ -n "$BUILD_TAGS" ]]; then
+          BUILD_ARGUMENTS+=(-tags "$BUILD_TAGS")
+        fi
+        if [[ -n "$LDFLAGS" ]]; then
+          BUILD_ARGUMENTS+=(-ldflags "$LDFLAGS")
+        fi
+
+        CGO_ENABLED=0 go build "${BUILD_ARGUMENTS[@]}" "$PACKAGE"
+
+        ASSET="$RUNNER_TEMP/${BINARY_NAME}_${GOOS}_${GOARCH}"
+        if [[ "$GOOS" == windows ]]; then
+          ASSET+=.zip
+          (cd "$OUTPUT_DIRECTORY" && zip -q "$ASSET" "$BINARY_NAME.exe")
+        else
+          ASSET+=.tar.gz
+          tar -C "$OUTPUT_DIRECTORY" -czf "$ASSET" "$BINARY_NAME"
+        fi
+        echo "artifact-path=$ASSET" >> "$GITHUB_OUTPUT"
+      working-directory: ${{ inputs.working-directory }}
+    - name: Upload binary
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        if-no-files-found: error
+        name: ${{ inputs.binary-name }}-${{ matrix.target.goos }}-${{ matrix.target.goarch }}
+        path: ${{ steps.build.outputs.artifact-path }}
+        retention-days: ${{ inputs.retention-days }}
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJSON(inputs.targets) }}
