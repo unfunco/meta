@@ -37,9 +37,7 @@ jobs:
         version: latest
         working-directory: ${{ inputs.working-directory }}
     - name: Check formatting
-      run: |
-        FORMATTED=$(go fmt ./...)
-        test -z "$FORMATTED"
+      run: test -z "$(go fmt ./...)"
       working-directory: ${{ inputs.working-directory }}
     - name: Check dependencies
       run: go mod verify

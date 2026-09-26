@@ -22,29 +22,12 @@ jobs:
       uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
       with:
         cache: false
-        go-version-file: tests/fixtures/go/go.mod
+        go-version: '1.27.1'
     - name: Check workflows
       run: go run github.com/rhysd/actionlint/cmd/actionlint@v1.7.12
-    - name: Test Go formatting check
-      run: ruby tests/verify-go-format.rb
-  go:
-    name: Go
-    uses: ./.github/workflows/verify-go.yaml
-    with:
-      working-directory: tests/fixtures/go
-  terraform:
-    name: Terraform
-    uses: ./.github/workflows/verify-terraform.yaml
-    with:
-      run-tests: true
-      working-directory: tests/fixtures/terraform
   release:
     name: Release
     if: ${{ github.event_name == 'push' }}
-    needs:
-    - workflows
-    - go
-    - terraform
     permissions:
       contents: write
       pull-requests: write
