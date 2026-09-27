@@ -9,7 +9,7 @@ on:
         required: false
         type: string
       build-tags:
-        default: ''
+        default: lambda.norpc
         description: A comma-separated list of build tags.
         required: false
         type: string
