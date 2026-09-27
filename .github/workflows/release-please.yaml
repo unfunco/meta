@@ -9,6 +9,9 @@ on:
       tag-name:
         description: The tag name created by Release Please.
         value: ${{ jobs.release.outputs.tag-name }}
+      version:
+        description: The version released by Release Please.
+        value: ${{ jobs.release.outputs.version }}
 
 jobs:
   release:
@@ -16,6 +19,7 @@ jobs:
     outputs:
       release-created: ${{ steps.release.outputs.release_created }}
       tag-name: ${{ steps.release.outputs.tag_name }}
+      version: ${{ steps.release.outputs.version }}
     runs-on: ubuntu-26.04
     permissions:
       contents: write
