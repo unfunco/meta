@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.3.0](https://github.com/unfunco/meta/compare/v0.2.0...v0.3.0) (2026-09-27)
+
+
+### 🎉 New features
+
+* Add build ref input and release version output ([#24](https://github.com/unfunco/meta/issues/24)) ([b039b07](https://github.com/unfunco/meta/commit/b039b07965984ad44d18bbd6fca28f399065be2a))
+* Add reusable Go Lambda release workflows ([#21](https://github.com/unfunco/meta/issues/21)) ([191db36](https://github.com/unfunco/meta/commit/191db362161c64b36274e668b4322d95b2674dac))
+
+
+### 🧹 Miscellaneous
+
+* Simplify reusable workflow check names ([#23](https://github.com/unfunco/meta/issues/23)) ([4740d54](https://github.com/unfunco/meta/commit/4740d54c62458f9277198681faf594a738e151c3))
+
 ## [0.2.0](https://github.com/unfunco/meta/compare/v0.1.0...v0.2.0) (2026-09-26)
 
 
