@@ -53,7 +53,7 @@ permissions:
 
 jobs:
   build:
-    name: Build (${{ inputs.goarch }})
+    name: Build
     outputs:
       artifact-name: ${{ inputs.artifact-name }}
     runs-on: ubuntu-26.04

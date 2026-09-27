@@ -12,7 +12,7 @@ on:
 
 jobs:
   release:
-    name: Release Please
+    name: Release
     outputs:
       release-created: ${{ steps.release.outputs.release_created }}
       tag-name: ${{ steps.release.outputs.tag_name }}
