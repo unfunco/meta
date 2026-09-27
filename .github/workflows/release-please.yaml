@@ -1,11 +1,21 @@
 name: Release Please
 
 on:
-  workflow_call: { }
+  workflow_call:
+    outputs:
+      release-created:
+        description: Whether Release Please created a release.
+        value: ${{ jobs.release.outputs.release-created }}
+      tag-name:
+        description: The tag name created by Release Please.
+        value: ${{ jobs.release.outputs.tag-name }}
 
 jobs:
   release:
     name: Release Please
+    outputs:
+      release-created: ${{ steps.release.outputs.release_created }}
+      tag-name: ${{ steps.release.outputs.tag_name }}
     runs-on: ubuntu-26.04
     permissions:
       contents: write
