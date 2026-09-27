@@ -31,7 +31,7 @@ permissions:
 
 jobs:
   sync:
-    name: Sync to S3
+    name: Sync Artifact
     runs-on: ubuntu-26.04
     steps:
     - name: Download artifact
