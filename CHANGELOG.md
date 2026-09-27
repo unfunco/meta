@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0](https://github.com/unfunco/meta/compare/v0.3.0...v0.4.0) (2026-09-27)
+
+
+### 🎉 New features
+
+* Default Lambda builds to no RPC ([#25](https://github.com/unfunco/meta/issues/25)) ([00248d9](https://github.com/unfunco/meta/commit/00248d90a595d83d2e97ae72f5ea8089e570a101))
+
 ## [0.3.0](https://github.com/unfunco/meta/compare/v0.2.0...v0.3.0) (2026-09-27)
 
 
