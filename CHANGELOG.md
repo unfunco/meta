@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.4.0](https://github.com/unfunco/meta/compare/v0.3.0...v0.4.0) (2026-11-08)
+
+
+### 🎉 New features
+
+* Add a reusable workflow for labelling PRs ([#28](https://github.com/unfunco/meta/issues/28)) ([497bb10](https://github.com/unfunco/meta/commit/497bb10691e0de275bea32c01be8371edadee840))
+* Default Lambda builds to no RPC ([#25](https://github.com/unfunco/meta/issues/25)) ([00248d9](https://github.com/unfunco/meta/commit/00248d90a595d83d2e97ae72f5ea8089e570a101))
+
+
+### 🧹 Miscellaneous
+
+* Bump actions/download-artifact from 8.0.1 to 8.0.2 ([#29](https://github.com/unfunco/meta/issues/29)) ([928086d](https://github.com/unfunco/meta/commit/928086d93e43cd743eb8cd3b5b2de8b4e45e44e6))
+* Bump actions/upload-artifact from 7.0.1 to 7.0.2 ([#30](https://github.com/unfunco/meta/issues/30)) ([f570458](https://github.com/unfunco/meta/commit/f5704587e568155d9b3090319011bb2084c4b388))
+
 ## [0.3.0](https://github.com/unfunco/meta/compare/v0.2.0...v0.3.0) (2026-09-27)
 
 
