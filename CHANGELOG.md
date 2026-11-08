@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/unfunco/meta/compare/v0.4.0...v0.4.1) (2026-11-08)
+
+
+### 🐛 Bug fixes
+
+* Match existing labels case-insensitively ([#31](https://github.com/unfunco/meta/issues/31)) ([f36743b](https://github.com/unfunco/meta/commit/f36743b5967617c21b83172df78c530db43c50b1))
+
 ## [0.4.0](https://github.com/unfunco/meta/compare/v0.3.0...v0.4.0) (2026-11-08)
 
 
