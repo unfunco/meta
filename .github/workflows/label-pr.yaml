@@ -37,21 +37,23 @@ jobs:
             test: 'test 🧪',
           }
 
-          const existingLabels = new Set(
+          // Label names are case-insensitive on GitHub, so match them that
+          // way and apply the label exactly as the repository spells it.
+          const existingLabels = new Map(
             await github.paginate(github.rest.issues.listLabelsForRepo, {
               owner: context.repo.owner,
               per_page: 100,
               repo: context.repo.repo,
-            }).then(labels => labels.map(label => label.name))
+            }).then(labels => labels.map(label => [label.name.toLowerCase(), label.name]))
           )
 
           const match = pullRequest.title.match(
             /^(chore|ci|docs|feat|fix|perf|refactor|revert|test)(?:\([a-z0-9][a-z0-9._/-]*\))?!?: /
           )
 
-          const label = match && typeToLabelMap[match[1]]
+          const label = match && existingLabels.get(typeToLabelMap[match[1]])
 
-          if (label && existingLabels.has(label)) {
+          if (label) {
             await github.rest.issues.addLabels({
               issue_number: pullRequest.number,
               labels: [label],
