@@ -1,0 +1,61 @@
+name: Label PR
+
+on:
+  workflow_call: { }
+
+permissions:
+  contents: read
+
+jobs:
+  label:
+    name: Label
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-slim
+    steps:
+    - name: Apply labels based on the PR title
+      uses: actions/github-script@v9.0.0
+      with:
+        script: |
+          const pullRequest = context.payload.pull_request
+          if (!pullRequest) {
+            core.info(`Skipping, ${context.eventName} is not a pull request event.`)
+            return
+          }
+
+          const typeToLabelMap = {
+            chore: 'chore 🧹',
+            ci: 'ci ⚙️',
+            docs: 'docs 📚',
+            feat: 'feature 🎉',
+            fix: 'fix 🐛',
+            perf: 'performance ⚡',
+            refactor: 'refactor 🔨',
+            revert: 'revert ‼️',
+            test: 'test 🧪',
+          }
+
+          const existingLabels = new Set(
+            await github.paginate(github.rest.issues.listLabelsForRepo, {
+              owner: context.repo.owner,
+              per_page: 100,
+              repo: context.repo.repo,
+            }).then(labels => labels.map(label => label.name))
+          )
+
+          const match = pullRequest.title.match(
+            /^(chore|ci|docs|feat|fix|perf|refactor|revert|test)(?:\([a-z0-9][a-z0-9._/-]*\))?!?: /
+          )
+
+          const label = match && typeToLabelMap[match[1]]
+
+          if (label && existingLabels.has(label)) {
+            await github.rest.issues.addLabels({
+              issue_number: pullRequest.number,
+              labels: [label],
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+            })
+          }

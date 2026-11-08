@@ -11,6 +11,8 @@ workflows:
         - 'actions/checkout@v7.0.1'
         - 'actions/setup-go@v7.0.0'
         - 'actions/upload-artifact@v7.0.1'
+    '.github/workflows/label-pr.yaml':
+        - 'actions/github-script@v9.0.0'
     '.github/workflows/release-please.yaml':
         - 'actions/checkout@v7.0.1'
         - 'googleapis/release-please-action@v5.0.0'
@@ -20,8 +22,7 @@ workflows:
     '.github/workflows/self-ci.yaml':
         - 'actions/checkout@v7.0.1'
         - 'actions/setup-go@v7.0.0'
-    '.github/workflows/self-pr-label.yaml':
-        - 'actions/github-script@v9.0.0'
+    '.github/workflows/self-pr-label.yaml': []
     '.github/workflows/verify-go.yaml':
         - 'actions/checkout@v7.0.1'
         - 'actions/setup-go@v7.0.0'
