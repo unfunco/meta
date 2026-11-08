@@ -107,7 +107,7 @@ jobs:
         (cd "$OUTPUT_DIRECTORY" && zip -q "$RUNNER_TEMP/bootstrap.zip" bootstrap)
       working-directory: ${{ inputs.working-directory }}
     - name: Upload Lambda archive
-      uses: actions/upload-artifact@v7.0.1
+      uses: actions/upload-artifact@v7.0.2
       with:
         if-no-files-found: error
         name: ${{ inputs.artifact-name }}
