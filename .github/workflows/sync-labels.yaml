@@ -1,0 +1,143 @@
+name: Sync labels
+
+on:
+  workflow_call:
+    inputs:
+      delete-extra-labels:
+        default: false
+        description: Delete labels outside the canonical set, only honoured on workflow_dispatch.
+        required: false
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    name: Sync
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+    runs-on: ubuntu-slim
+    steps:
+    - name: Sync the canonical labels
+      uses: actions/github-script@v9.0.0
+      env:
+        DELETE_EXTRA_LABELS: ${{ inputs.delete-extra-labels }}
+      with:
+        script: |
+          // The single source of truth for labels across unfunco repositories.
+          // Aliases are migrated to the canonical label, alongside any label
+          // whose name matches once emoji and punctuation are ignored.
+          const canonicalLabels = [
+            { name: 'feature 🎉', color: '1d76db', description: 'A new feature', aliases: ['enhancement', 'feat'] },
+            { name: 'fix 🐛', color: 'd73a4a', description: 'A bug fix', aliases: ['bug'] },
+            { name: 'performance ⚡', color: '444444', description: 'A performance improvement', aliases: ['perf'] },
+            { name: 'revert ‼️', color: 'fbca04', description: 'Reverts a previous change', aliases: [] },
+            { name: 'docs 📚', color: 'bfdadc', description: 'Documentation changes', aliases: ['documentation'] },
+            { name: 'style 🎨', color: 'c5def5', description: 'Code style changes that do not affect behaviour', aliases: [] },
+            { name: 'refactor 🔨', color: 'f9d0c4', description: 'Code changes that neither fix a bug nor add a feature', aliases: ['refactoring'] },
+            { name: 'test 🧪', color: 'c2e0c6', description: 'Adds or corrects tests', aliases: ['tests', 'testing'] },
+            { name: 'build 📦', color: 'd4c5f9', description: 'Build system or dependency changes', aliases: [] },
+            { name: 'ci ⚙️', color: 'bfd4f2', description: 'Continuous integration changes', aliases: [] },
+            { name: 'chore 🧹', color: 'fef2c0', description: 'Maintenance that does not change source or tests', aliases: [] },
+            { name: 'automata 🤖', color: 'fbca04', description: 'Opened by automation', aliases: ['automation'] },
+            { name: 'autorelease: pending', color: 'fcfcfc', description: 'Release PR awaiting release', aliases: [] },
+            { name: 'autorelease: tagged', color: '454545', description: 'Release PR that has been tagged', aliases: [] },
+          ]
+
+          const deleteExtraLabels = process.env.DELETE_EXTRA_LABELS === 'true'
+            && context.eventName === 'workflow_dispatch'
+          const { owner, repo } = context.repo
+          const normalise = name => name.toLowerCase().replace(/[^a-z0-9:]+/g, ' ').trim()
+
+          const existingLabels = await github.paginate(github.rest.issues.listLabelsForRepo, {
+            owner,
+            per_page: 100,
+            repo,
+          })
+
+          const canonicalNames = new Set(canonicalLabels.map(label => label.name.toLowerCase()))
+          const handled = new Set()
+
+          for (const canonical of canonicalLabels) {
+            const keys = new Set([canonical.name, ...canonical.aliases].map(normalise))
+            let current = existingLabels.find(label => label.name.toLowerCase() === canonical.name.toLowerCase())
+            const aliases = existingLabels.filter(label => !canonicalNames.has(label.name.toLowerCase())
+              && !handled.has(label.name)
+              && keys.has(normalise(label.name)))
+
+            if (!current && aliases.length > 0) {
+              // Renaming keeps every issue and PR assignment intact.
+              current = aliases.shift()
+              core.info(`Renaming "${current.name}" to "${canonical.name}".`)
+              handled.add(current.name)
+              await github.rest.issues.updateLabel({
+                color: canonical.color,
+                description: canonical.description,
+                name: current.name,
+                new_name: canonical.name,
+                owner,
+                repo,
+              })
+            } else if (!current) {
+              core.info(`Creating "${canonical.name}".`)
+              await github.rest.issues.createLabel({
+                color: canonical.color,
+                description: canonical.description,
+                name: canonical.name,
+                owner,
+                repo,
+              })
+            } else if (current.name !== canonical.name
+              || current.color.toLowerCase() !== canonical.color
+              || (current.description || '') !== canonical.description) {
+              core.info(`Updating "${current.name}".`)
+              await github.rest.issues.updateLabel({
+                color: canonical.color,
+                description: canonical.description,
+                name: current.name,
+                new_name: canonical.name,
+                owner,
+                repo,
+              })
+            }
+
+            for (const alias of aliases) {
+              handled.add(alias.name)
+              const items = await github.paginate(github.rest.issues.listForRepo, {
+                labels: alias.name,
+                owner,
+                per_page: 100,
+                repo,
+                state: 'all',
+              })
+              for (const item of items) {
+                await github.rest.issues.addLabels({
+                  issue_number: item.number,
+                  labels: [canonical.name],
+                  owner,
+                  repo,
+                })
+              }
+              core.info(`Copied "${alias.name}" to "${canonical.name}" on ${items.length} issues and PRs.`)
+              if (deleteExtraLabels) {
+                core.info(`Deleting alias "${alias.name}".`)
+                await github.rest.issues.deleteLabel({ name: alias.name, owner, repo })
+              } else {
+                core.warning(`Alias "${alias.name}" kept, run manually with delete-extra-labels to remove it.`)
+              }
+            }
+          }
+
+          const extraLabels = existingLabels.filter(label => !canonicalNames.has(label.name.toLowerCase())
+            && !handled.has(label.name))
+          for (const label of extraLabels) {
+            if (deleteExtraLabels) {
+              core.info(`Deleting extra label "${label.name}".`)
+              await github.rest.issues.deleteLabel({ name: label.name, owner, repo })
+            } else {
+              core.warning(`Extra label "${label.name}" kept, run manually with delete-extra-labels to remove it.`)
+            }
+          }

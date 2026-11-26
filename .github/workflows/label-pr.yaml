@@ -26,6 +26,7 @@ jobs:
           }
 
           const typeToLabelMap = {
+            build: 'build 📦',
             chore: 'chore 🧹',
             ci: 'ci ⚙️',
             docs: 'docs 📚',
@@ -34,6 +35,7 @@ jobs:
             perf: 'performance ⚡',
             refactor: 'refactor 🔨',
             revert: 'revert ‼️',
+            style: 'style 🎨',
             test: 'test 🧪',
           }
 
@@ -48,7 +50,7 @@ jobs:
           )
 
           const match = pullRequest.title.match(
-            /^(chore|ci|docs|feat|fix|perf|refactor|revert|test)(?:\([a-z0-9][a-z0-9._/-]*\))?!?: /
+            /^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(?:\([a-z0-9][a-z0-9._/-]*\))?!?: /
           )
 
           const label = match && existingLabels.get(typeToLabelMap[match[1]])
