@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2](https://github.com/unfunco/meta/compare/v0.4.1...v0.4.2) (2026-11-26)
+
+
+### 🧹 Miscellaneous
+
+* Standardise changelog emoji sections ([#33](https://github.com/unfunco/meta/issues/33)) ([eaf2215](https://github.com/unfunco/meta/commit/eaf2215f4860d4b187449bb6b03d2744c58fd163))
+
 ## [0.4.1](https://github.com/unfunco/meta/compare/v0.4.0...v0.4.1) (2026-11-08)
 
 
